@@ -7,7 +7,7 @@ Created on Mon Apr 20 23:45:35 2020
 """
 import manticore_tools as tools
 
-EVENT_FILTER = 2
+EVENT_FILTER = 0
 TOTAL_DICT_OF_DAYS_FILE = ".total_dict_of_days.txt"
 # =============================================================================
 #
@@ -47,117 +47,6 @@ def set_of_tails(files_list, day):
 # =============================================================================
 #
 # =============================================================================
-'''
-def dict_of_num_min_max_in_tail(tail, files_list, day):
-    """Find minimum and maximum event number from one tail from one day.
-
-    Takes one tail from one day in format '001', '002' etc. Then searches
-    for all the corresponding tail files (22 in general case). Runs through
-    each of them, reads their event numbers.
-    Finally returns list with two values: minimum event number for all this
-    files and the maximum one."""
-
-    print("Event numbers range in tail {} are finding out...".format(tail))
-    chunk_size = 282
-    num_max, num_min = 0, 9999999999
-    for file in files_list:
-        file = tools.check_and_cut_the_tail(file)
-        day_of_this_file = file[:-18]
-        if day_of_this_file == day:
-            tail_of_this_file = file[-3:]
-            if tail_of_this_file == tail:
-                file = tools.make_BSM_file_temp(file) + '.wqp'
-                with open(file, 'rb') as wqp_file:
-                    print(file)
-                    try:
-                        chunk = wqp_file.read(chunk_size)
-                        num_ev_bytes = chunk[4:8]
-                        num_ev = tools.unpacked_from_bytes(
-                            'I', num_ev_bytes)[0]
-                        if num_ev < num_min:
-                            num_min = num_ev
-                    except Exception:
-                        print("{} Chunk number {} in file {} is seems to be corrupted!\n".format(
-                            "WQP FILE CORRUPTION ERROR!",
-                            'ZERO',
-                            file))
-                    while chunk:
-                        next_chunk = wqp_file.read(chunk_size)
-                        if next_chunk: chunk = next_chunk
-                        else: break
-                    try:
-                        num_ev_bytes = chunk[4:8]
-                        num_ev = tools.unpacked_from_bytes(
-                            'I', num_ev_bytes)[0]
-                        if num_ev > num_max:
-                            num_max = num_ev
-                    except Exception:
-                        print("{} Chunk number {} in file {} is seems to be corrupted!\n".format(
-                            "WQP FILE CORRUPTION ERROR!",
-                            'LAST',
-                            file))
-    print(num_min, num_max)
-    return [num_min, num_max]
-'''
-# =============================================================================
-#
-# =============================================================================
-'''
-def count_tails_range(start_time):
-    """For all tails in .files_list.txt find maximum and minimum event number.
-
-    For each day it finds all the files with the same tail (all the
-    files ".001", then all the files ".002" etc.). There must be 22 files
-    for every tail in every day in general case. And it searches the
-    minimal and maximal event number for this (22) files.
-
-    Finally it returnes the dictionary of dictionaries with next construction:
-    dict_of_days = {day: dict_of_max_min},
-    dict_of_max_min = {tail: [min_number, max_number]}"""
-
-    dict_of_max_min = {}
-    dict_of_days = {}
-    tails_counter = 0
-    print("Event numbers range in parallel bsms are finding out...")
-    with open('.files_list.txt', 'r') as files:
-        files_list = files.readlines()
-    days_list = sorted(list(set_of_days(files_list)))
-
-    for day in days_list:
-        tails_list = sorted(list(set_of_tails(files_list, day)))
-        for tail in tails_list:
-            dict_of_max_min[tail] = dict_of_num_min_max_in_tail(
-                tail,
-                files_list,
-                day)
-            dict_of_days[day] = dict_of_max_min
-            tails_counter += 1
-            tools.syprogressbar(tails_counter,
-                                len(tails_list),
-                                u'\u24C2',
-                                "finding out of event numbers range in {} tail finished".format(
-                                    tail),
-                                start_time)
-        print(tools.time_check(start_time))
-    print("Finding out of event numbers range in parallel bsms was finished.")
-    print(tools.time_check(start_time))
-    return dict_of_days
- '''
-# =============================================================================
-#
-# =============================================================================
-'''
-def create_empty_matrix_for_one_tail(tail):
-    """Takes tail ID (three digits) and creates empty matrix with N strings,
-    where N - number of events in this tail through all tail-files. Each
-    string contains 22 columns, each of them contains data from one BSM in this
-    event."""
-
-    return [['']*22 for i in range(tail[0], tail[1]+1)]
-'''
-# =============================================================================
-#
-# =============================================================================
 
 def list_of_tail_files(day_directory, list_of_BSM, tail):
 
@@ -171,17 +60,6 @@ def list_of_tail_files(day_directory, list_of_BSM, tail):
             tools.TAIL_FILE_REGULAR_PATTERN + tail).split()[0]
         tail_files.append(new_tail_file)
     return tail_files
-
-# =============================================================================
-#
-# =============================================================================
-'''
-def clean_the_matrix_of_empty_events(matrix_of_events):
-    """Cleaning the matrix of events for one tail from events where no one
-    cluster was """
-    empty_event = ['']*22
-    return [value for value in matrix_of_events if value != empty_event]
-'''
 # =============================================================================
 #
 # =============================================================================
@@ -213,11 +91,6 @@ def clean_the_matrix_of_USER_NUMBER_cluster_events(day_directory, tail, matrix_o
                 event_numbers_parallel_list.append(min_event_number_in_tail + i)
     return [value for value in new_matrix_of_events if value != empty_event], event_numbers_parallel_list
 # =============================================================================
-#    
-#def record_matrix_of_one_tail_into_file(cleaned_matrix_with_data):
-#
-#    return 0
-# =============================================================================
 #
 # =============================================================================
 
@@ -243,61 +116,6 @@ def print_statistics_for_matrix_of_events(matrix_of_events, stat_file):
 # =============================================================================
 #
 # =============================================================================
-    # =============================================================================
-#
-# =============================================================================
-    # =============================================================================
-#
-# =============================================================================
-#def fill_the_summary_file_for_one_tail(tail, day_directory, start_time, tails_counter, length_of_list):
-#    
-#    print("\nEmpty matrix for tail {} from {}are creating...".format(tail, day_directory))
-#    empty_matrix=create_empty_matrix_for_one_tail(tail)
-#    print("\nEmpty matrix for tail {} from {} has been created...".format(tail, day_directory))
-#    
-#    size_before=len(empty_matrix)
-#    
-#    print("\nFiles list for tail  {}  from  {}  are creating...".format(tail, day_directory))
-#    list_of_BSM = tools.directory_objects_parser(day_directory, tools.BSM_REGULAR_PATTERN).split()
-#    tail_files = list_of_tail_files(day_directory, list_of_BSM, tail)
-#    print("\nFiles list for tail  {}  from  {}  has been created...".format(tail, day_directory))
-#
-#    print("\nMatrix for tail {} from {} are filling with data...".format(tail, day_directory))
-#    matrix_with_data=fill_empty_matrix_for_one_tail(empty_matrix, tail_files, tail, start_time)
-#    print("\nEmpty matrix for tail {} from {} has been filled with data...".format(tail, day_directory))
-#    
-#    print("\nMatrix for tail {} from {} are cleaning for empty 0-coincidences events...".format(tail, day_directory))
-#    cleaned_matrix_with_data=clean_the_matrix_of_empty_events(matrix_with_data)
-#    print("\nMatrix for tail {} from {} has been cleaned from empty 0-coincidences events...".format(tail, day_directory))    
-#    
-#    print("\nMatrix for tail {} from {} are cleaning for less then USER_NUMBER-coincidences events...".format(tail, day_directory))
-#    cleaned_matrix_with_data=clean_the_matrix_of_USER_NUMBER_cluster_events(matrix_with_data)
-#    print("\nMatrix for tail {} from {} has been cleaned from empty less then USER_NUMBER-coincidences events...".format(tail, day_directory))        
-#        
-#    size_after=len(cleaned_matrix_with_data)
-#    print("Empty events made up {}% of all events.".format(
-#            int(size_after/size_before*100)))    
-#    
-#    print("\nFilling the summary file for tail {} with data...".format(tail))
-#    record_matrix_of_one_tail_into_file(cleaned_matrix_with_data)
-#    print("\nFilling the summary file for tail {} with data...".format(tail))    
-#
-#    stat_file = day_directory + tail + '.stat'
-#    print_statistics_for_matrix_of_events(cleaned_matrix_with_data, stat_file)
-# =============================================================================
-#
-# =============================================================================
-    
-#def fill_the_sum(start_time):
-#    list_of_
-    
-# =============================================================================
-#
-# =============================================================================
-# =============================================================================
-#
-# =============================================================================
-
 
 def fill_the_matrix_of_events(matrix_of_events, tail_files, tail, tail_max_min_list, start_time, clean_status = 0):
 
@@ -415,21 +233,6 @@ def create_summary_file_for_tail(tail, tail_max_min_list, start_time,
 
     print("Event matrix with clean amplitudes for tail  {}  from  {}  are creating...".format(tail, day_directory))
     matrix_of_events_clean = fill_the_matrix_of_events(matrix_of_events_clean, tail_files, tail, tail_max_min_list, start_time)
-
-#    print("Cleaning the event matrix for tail  {}  from  {}  for 0-coincidences events...".format(tail, day_directory))
-#    before_zero_cleaning = len(matrix_of_events)
-#    no_zero_coin_matrix_of_events = clean_the_matrix_of_empty_events(matrix_of_events)
-#    after_zero_cleaning = len(no_zero_coin_matrix_of_events)
-#    print("DELETED  {:.3f}% events".format((before_zero_cleaning - after_zero_cleaning)/before_zero_cleaning*100))
-#    print("Out file for  {}  tail from  {}  are filling for 0-coins...".format(tail, day_directory))
-#    with open(day_directory + tail + '.out0', 'w+') as out_tail_file:
-#        for i in range(len(no_zero_coin_matrix_of_events)):
-#            out_tail_file.write(
-#                "Event_number\t{}\tin_tail_files\t{}\tfor_the\t{}\n".format(
-#                    event_numbers_parallel_list[i], tail, day_directory))
-#            for j in range(len(no_zero_coin_matrix_of_events[i])):
-#                out_tail_file.write("{}\n".format(no_zero_coin_matrix_of_events[i][j]))
-#            out_tail_file.write('\n')
 
     print("\nMatrix for tail {} from {} are cleaning for less then USER_NUMBER-coincidences events...".format(tail, day_directory))
     before_user_cleaning_static = len(matrix_of_events_static)
@@ -592,9 +395,3 @@ def merge_list_files(day_directory):
 # =============================================================================
 #
 # =============================================================================
-
-
-
-
-
-

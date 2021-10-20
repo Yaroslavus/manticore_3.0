@@ -1,0 +1,4 @@
+.spyproject/
+__pycache__/
+.files_list.txt
+.mess.txt
