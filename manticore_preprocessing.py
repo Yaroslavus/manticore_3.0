@@ -148,7 +148,8 @@ def fill_the_matrix_of_events(matrix_of_events, tail_files, tail, tail_max_min_l
                 ns = (time_array[0] & 0x7f)*10
                 mks = (time_array[0] & 0xff80) >> 7
                 mks |= (time_array[1] & 1) << 9
-                mls = (time_array[1] & 0x7fe) >> 11
+#                mls = (time_array[1] & 0x7fe) >> 11 # IF leads to mls = 0 ...
+                mls = (time_array[1] & 0x7fe) >> 1 # TRY THIS !!!
                 s = (time_array[1] & 0xf800) >> 11
                 s |= (time_array[2] & 1) << 5
                 m = (time_array[2] & 0x7e) >> 1
@@ -208,7 +209,7 @@ def create_summary_file_for_tail(tail, tail_max_min_list, start_time,
 
 
     print("\nEmpty matrix of events with static pedestals cleaning are creating...")
-    matrix_of_events_static = [['']*22 for i in range(max_event_number_in_tail - min_event_number_in_tail + 1)]
+#    matrix_of_events_static = [['']*22 for i in range(max_event_number_in_tail - min_event_number_in_tail + 1)]
     print("\nEmpty matrix of events has been created...")
 
     print("\nFiles list for tail  {}  from  {}  are creating...".format(tail, day_directory))
@@ -226,7 +227,7 @@ def create_summary_file_for_tail(tail, tail_max_min_list, start_time,
 
 
     print("Event matrix with static pedestals cleaning for tail  {}  from  {}  are creating...".format(tail, day_directory))
-    matrix_of_events_static = fill_the_matrix_of_events(matrix_of_events_static, tail_files, tail, tail_max_min_list, start_time, 1)
+#    matrix_of_events_static = fill_the_matrix_of_events(matrix_of_events_static, tail_files, tail, tail_max_min_list, start_time, 1)
     
     print("Event matrix with dynamic pedestals cleaning for tail  {}  from  {}  are creating...".format(tail, day_directory))
     matrix_of_events_dynamic = fill_the_matrix_of_events(matrix_of_events_dynamic, tail_files, tail, tail_max_min_list, start_time, 2)
@@ -235,32 +236,32 @@ def create_summary_file_for_tail(tail, tail_max_min_list, start_time,
     matrix_of_events_clean = fill_the_matrix_of_events(matrix_of_events_clean, tail_files, tail, tail_max_min_list, start_time)
 
     print("\nMatrix for tail {} from {} are cleaning for less then USER_NUMBER-coincidences events...".format(tail, day_directory))
-    before_user_cleaning_static = len(matrix_of_events_static)
+#    before_user_cleaning_static = len(matrix_of_events_static)
     before_user_cleaning_dynamic = len(matrix_of_events_dynamic)
     before_user_cleaning_clean = len(matrix_of_events_clean)
 
-    no_user_number_coin_matrix_of_events_static, event_numbers_parallel_list_static = clean_the_matrix_of_USER_NUMBER_cluster_events(day_directory, tail, matrix_of_events_static, min_event_number_in_tail, 1)
+#    no_user_number_coin_matrix_of_events_static, event_numbers_parallel_list_static = clean_the_matrix_of_USER_NUMBER_cluster_events(day_directory, tail, matrix_of_events_static, min_event_number_in_tail, 1)
     no_user_number_coin_matrix_of_events_dynamic, event_numbers_parallel_list_dynamic = clean_the_matrix_of_USER_NUMBER_cluster_events(day_directory, tail, matrix_of_events_dynamic, min_event_number_in_tail, 2)
     no_user_number_coin_matrix_of_events_clean, event_numbers_parallel_list_clean = clean_the_matrix_of_USER_NUMBER_cluster_events(day_directory, tail, matrix_of_events_clean, min_event_number_in_tail)
 
-    after_user_cleaning_static = len(no_user_number_coin_matrix_of_events_static)
+#    after_user_cleaning_static = len(no_user_number_coin_matrix_of_events_static)
     after_user_cleaning_dynamic = len(no_user_number_coin_matrix_of_events_dynamic)
     after_user_cleaning_clean = len(no_user_number_coin_matrix_of_events_clean)
     
-    print("DELETED  {:.3f}% events".format((before_user_cleaning_static - after_user_cleaning_static)/before_user_cleaning_static*100))
+#    print("DELETED  {:.3f}% events".format((before_user_cleaning_static - after_user_cleaning_static)/before_user_cleaning_static*100))
     print("DELETED  {:.3f}% events".format((before_user_cleaning_dynamic - after_user_cleaning_dynamic)/before_user_cleaning_dynamic*100))
     print("DELETED  {:.3f}% events".format((before_user_cleaning_clean - after_user_cleaning_clean)/before_user_cleaning_clean*100))
         
-    print("Out file for Static amplitudes {} tail from  {}  are filling for user_number-coins...".format(tail, day_directory))
-    with open(day_directory + tail + '_static.out', 'w+') as out_tail_file:
-        for i in range(len(no_user_number_coin_matrix_of_events_static)):
-            out_tail_file.write(
-                "Event_number\t{}\tin_tail_files\t{}\tfor_the\t{}\n".format(
-                    event_numbers_parallel_list_static[i],
-                    tail, day_directory))
-            for j in range(len(no_user_number_coin_matrix_of_events_static[i])):
-                out_tail_file.write("{}\n".format(no_user_number_coin_matrix_of_events_static[i][j]))
-            out_tail_file.write('\n')
+#    print("Out file for Static amplitudes {} tail from  {}  are filling for user_number-coins...".format(tail, day_directory))
+#    with open(day_directory + tail + '_static.out', 'w+') as out_tail_file:
+#        for i in range(len(no_user_number_coin_matrix_of_events_static)):
+#            out_tail_file.write(
+#                "Event_number\t{}\tin_tail_files\t{}\tfor_the\t{}\n".format(
+#                    event_numbers_parallel_list_static[i],
+#                    tail, day_directory))
+#            for j in range(len(no_user_number_coin_matrix_of_events_static[i])):
+#                out_tail_file.write("{}\n".format(no_user_number_coin_matrix_of_events_static[i][j]))
+#            out_tail_file.write('\n')
             
     print("Out file for Dynamic amplitudes {} tail from  {}  are filling for user_number-coins...".format(tail, day_directory))
     with open(day_directory + tail + '_dynamic.out', 'w+') as out_tail_file:
@@ -292,11 +293,11 @@ def create_summary_file_for_tail(tail, tail_max_min_list, start_time,
         start_time)
     
     
-    stat_file_static = day_directory + tail + '_static.stat'
+#    stat_file_static = day_directory + tail + '_static.stat'
     stat_file_dynamic = day_directory + tail + '_dynamic.stat'
     stat_file_clean = day_directory + tail + '_clean.stat'
     print("Statistics for static amplitudes for tail {} from {} are calculating...".format(tail, day_directory))
-    print_statistics_for_matrix_of_events(matrix_of_events_static, stat_file_static)
+#    print_statistics_for_matrix_of_events(matrix_of_events_static, stat_file_static)
     print("Statistics for dynamic amplitudes for tail {} from {} are calculating...".format(tail, day_directory))
     print_statistics_for_matrix_of_events(matrix_of_events_dynamic, stat_file_dynamic)
     print("Statistics for clean amplitudes for tail {} from {} are calculating...".format(tail, day_directory))

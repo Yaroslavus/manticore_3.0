@@ -39,7 +39,7 @@ if SET_0 == '1':
 
 manticore_parser.parser(SET_3, START_TIME)
 manticore_tools.is_preprocessing_needed(SET_1, START_TIME)
-manticore_decoding.to_process(START_TIME)
+manticore_decoding.to_process_1(START_TIME)
 manticore_preprocessing.fill_the_summary_files(START_TIME)
 
 if SET_2 != '1':
